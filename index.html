@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primary Health Care (PHC) Mental Health Triage Kiosk</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="kiosk-app-wrapper">
+        <!-- Top Institutional Brand Header -->
+        <header class="kiosk-top-header">
+            <div class="brand-badge">
+                <span class="symbol-icon">⚕️</span>
+                <span class="brand-text">PHC CLINICAL TRIAGE SYSTEM</span>
+            </div>
+            <div class="privacy-pill">
+                <span class="lock-icon">🔒</span>
+                <span>Stateless Medical Kiosk • Zero PHI Stored</span>
+            </div>
+        </header>
+
+        <!-- SCREEN 1: WELCOME SCREEN -->
+        <section id="screen-welcome" class="kiosk-screen active">
+            <div class="card card-welcome">
+                <div class="clinical-icon-circle">
+                    <span class="cross-icon">✚</span>
+                </div>
+                <h1 class="main-title">Primary Health Care (PHC)</h1>
+                <h2 class="sub-title">Mental Health Triage Kiosk</h2>
+                
+                <p class="lead-description">
+                    This self-guided terminal administers the clinically validated 
+                    <strong>Patient Health Questionnaire-9 (PHQ-9)</strong> to assess depressive 
+                    symptoms and determine psychological risk stratification for incoming patients.
+                </p>
+
+                <div class="kiosk-info-grid">
+                    <div class="info-card">
+                        <span class="info-icon">⏱️</span>
+                        <div>
+                            <h4>Estimated Time</h4>
+                            <p>2 to 3 minutes (9 questions)</p>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-icon">📋</span>
+                        <div>
+                            <h4>Validated Standard</h4>
+                            <p>Clinical PHQ-9 Protocol</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="privacy-notice-box">
+                    <div class="notice-header">
+                        <span class="shield-icon">🛡️</span>
+                        <strong>Patient Privacy &amp; Data Security Guarantee</strong>
+                    </div>
+                    <p>
+                        This kiosk operates on a <strong>strictly stateless architecture</strong> complying with HIPAA and medical confidentiality standards. 
+                        <strong>NO database is connected and NO data is saved to local disk or remote servers.</strong> 
+                        All inputs exist solely in temporary screen memory and are completely wiped once the session is finished or reset.
+                    </p>
+                </div>
+
+                <button id="btn-start" class="btn btn-primary btn-large" onclick="startAssessment()">
+                    Begin Assessment &rarr;
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN 2: ASSESSMENT SCREEN -->
+        <section id="screen-assessment" class="kiosk-screen">
+            <div class="assessment-container">
+                <div class="assessment-header-card">
+                    <div class="assessment-meta">
+                        <h2>PHQ-9 Clinical Assessment</h2>
+                        <div class="progress-pill">
+                            <span id="answered-count-text">0</span> of 9 Completed
+                        </div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%;"></div>
+                    </div>
+                    <p class="clinical-prompt">
+                        <strong>Clinical Instruction:</strong> Over the last <strong>2 weeks</strong>, how often have you been bothered by any of the following problems?
+                    </p>
+                </div>
+
+                <!-- Dynamic Questions Container -->
+                <form id="phq9-form" onsubmit="event.preventDefault();">
+                    <div id="quiz-container" class="questions-list">
+                        <!-- Questions injected by renderer.js -->
+                    </div>
+                </form>
+
+                <!-- Floating/Fixed Bottom Action Bar -->
+                <div class="assessment-footer">
+                    <div id="validation-alert" class="validation-alert hidden" role="alert">
+                        <span class="alert-icon">⚠️</span>
+                        <span id="validation-message">Please answer all 9 questions before proceeding.</span>
+                    </div>
+                    <div class="footer-buttons">
+                        <button type="button" class="btn btn-outline" onclick="confirmReset()">Cancel / Reset</button>
+                        <button type="button" id="btn-generate" class="btn btn-primary" onclick="generateReport()">Generate Report &rarr;</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 3: RESULTS SCREEN -->
+        <section id="screen-results" class="kiosk-screen">
+            <div class="card card-results">
+                <div class="results-header">
+                    <span class="confidential-badge">CONFIDENTIAL CLINICAL REPORT</span>
+                    <h2>Triage Diagnostic Summary</h2>
+                    <p class="results-subtitle">PHQ-9 Composite Score &amp; Clinical Stratification</p>
+                </div>
+
+                <!-- Large Circular Score Badge -->
+                <div class="score-display-wrapper">
+                    <div id="score-badge" class="score-circle">
+                        <div class="score-number-group">
+                            <span id="final-score" class="score-value">0</span>
+                            <span class="score-denominator">/ 27</span>
+                        </div>
+                        <span class="score-caption">PHQ-9 Score</span>
+                    </div>
+
+                    <div class="tier-label-wrapper">
+                        <span class="tier-indicator-dot"></span>
+                        <h3 id="severity-label" class="severity-title">Assessment Level</h3>
+                        <span id="score-tier-code" class="tier-code-badge">TIER</span>
+                    </div>
+                </div>
+
+                <!-- Clinical Action Box for Health Worker -->
+                <div id="action-box" class="action-recommendation-box">
+                    <div class="action-box-header">
+                        <span class="clipboard-icon">📋</span>
+                        <h4>Recommended Action for Primary Health Worker:</h4>
+                    </div>
+                    <div id="action-text" class="action-body">
+                        <!-- Dynamically injected recommendation -->
+                    </div>
+                </div>
+
+                <!-- Suicide Risk / Question 9 Safety Flag (Active if Q9 > 0) -->
+                <div id="critical-safety-flag" class="critical-safety-box hidden">
+                    <div class="safety-icon">🚨</div>
+                    <div class="safety-content">
+                        <h4>Immediate Clinical Alert — Question 9 Endorsement</h4>
+                        <p>
+                            The patient indicated thoughts of self-harm or suicide. 
+                            <strong>Immediate in-person clinical assessment and suicide risk evaluation are required</strong> 
+                            prior to patient discharge, irrespective of the composite score.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Reference Scoring Matrix -->
+                <div class="reference-matrix">
+                    <h4>Clinical Reference Tiers (PHQ-9)</h4>
+                    <div class="matrix-grid">
+                        <div class="matrix-item tier-green-ref">
+                            <span class="dot"></span>
+                            <strong>0 – 4:</strong> Minimal / No Depression
+                        </div>
+                        <div class="matrix-item tier-yellow-ref">
+                            <span class="dot"></span>
+                            <strong>5 – 14:</strong> Mild to Moderate Vulnerability
+                        </div>
+                        <div class="matrix-item tier-red-ref">
+                            <span class="dot"></span>
+                            <strong>15 – 27:</strong> Moderately Severe to Severe Risk
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reset Button -->
+                <div class="results-actions">
+                    <button id="btn-reset" class="btn btn-secondary btn-large" onclick="restartKiosk()">
+                        Finish &amp; Reset Kiosk
+                    </button>
+                    <p class="reset-hint">Clicking will securely purge all assessment data from screen memory.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>

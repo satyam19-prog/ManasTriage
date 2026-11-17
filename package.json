@@ -1,0 +1,53 @@
+{
+  "name": "phc-mental-health-kiosk",
+  "version": "1.0.0",
+  "description": "Primary Health Care (PHC) Mental Health Triage Kiosk desktop application using PHQ-9 screening.",
+  "main": "main.js",
+  "author": "Primary Health Care Systems",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "build:mac": "electron-builder --mac dmg"
+  },
+  "build": {
+    "appId": "com.phc.mentalhealthkiosk",
+    "productName": "PHC Mental Health Triage Kiosk",
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.medical",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "title": "PHC Mental Health Triage Kiosk Installer",
+      "iconSize": 100,
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ],
+      "window": {
+        "width": 540,
+        "height": 380
+      }
+    },
+    "directories": {
+      "output": "dist"
+    }
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.13.3"
+  }
+}
